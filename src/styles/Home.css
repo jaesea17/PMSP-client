@@ -1,0 +1,42 @@
+ .hide-div {
+     display: none;
+ }
+
+ .station-name {
+     cursor: pointer;
+     color: rgb(40, 40, 227);
+ }
+
+
+ /* .stations-div {
+     width: 70%;
+     height: 30vh;
+     border-radius: 10%;
+     box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.3);
+ }
+
+ .stations-div:hover {
+     box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.7);
+ }
+
+ @media (max-width: 768px) {
+     .stations-div {
+         width: 90%;
+         height: 40vh;
+     }
+
+     .stations-div:hover {
+         box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.7);
+     }
+ }
+
+ @media (max-width: 480px) {
+     .stations-div {
+         width: 50%;
+         height: 40vh;
+     }
+
+     .stations-div:hover {
+         box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.7);
+     }
+ } */
