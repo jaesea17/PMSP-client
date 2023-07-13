@@ -6,6 +6,7 @@ import LogoArea from "../components/reusables/LogoArea";
 import { baseUrl } from "../utils/baseUrl";
 import { addLikes } from "../utils/likes";
 import "../styles/Home.css"
+import { getTime } from "../utils/getTime";
 
 function Home() {
     const [stations, setStations] = useState([]);
@@ -32,8 +33,8 @@ function Home() {
             {/* <DashboardBtn /> */}
 
             <main style={{ "marginTop": "50px", "paddingLeft": "3%" }}>
-                <p>Welcome, select station and view the details.<br />
-                    Let us know the different price you bought at or like the latest buy if thesame.<br />
+                <p>Welcome, select a station and view the details.<br />
+                    Let us know the different price you bought at or like the "latest buy" if thesame.<br />
                     NB: Five "likes" automatically updates the pump price.
                 </p>
                 {
@@ -52,12 +53,13 @@ function Home() {
                                                 <>
                                                     {comResult.commodity}: ₦{comResult.price}/Litre<br></br><br></br>
                                                     {comResult.observations.map((obsvnResult: any) => {
+                                                        const dateString = obsvnResult.createdAt;
                                                         const observationId = obsvnResult.id, price = obsvnResult.price
                                                         const obvId = "observationId";
                                                         return (
                                                             <>
                                                                 <h4>Latest buys</h4>
-                                                                <p><span style={{ "fontStyle": 'italic' }}>{obsvnResult.user?.userName}</span> bought at: ₦{price}/Litre</p>
+                                                                <p><span style={{ "fontStyle": 'italic' }}>{obsvnResult.user?.userName}</span> bought at: ₦{price}/Litre ......... {getTime(dateString)}</p>
                                                                 <input
                                                                     type="button"
                                                                     value='like'
