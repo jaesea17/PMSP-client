@@ -9,7 +9,7 @@ function Register() {
     const navigate = useNavigate();
 
     const [inputs, setInputs] = useState({
-        fullname: "", email: "", gender: "", address: "", phone: "", password: "", confirm_password: ""
+        username: "", email: "", password: ""
     });
     const [registerError, setRegisterError] = useState("");
 
@@ -21,21 +21,20 @@ function Register() {
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
-        const { fullname, email, gender, address, phone, password, confirm_password } = inputs;
+        const { username, email, password } = inputs;
         const payload = {
-            "fullname": fullname, "email": email,
-            "gender": gender, "address": address,
-            "phone": phone, "password": password,
-            "confirm_password": confirm_password
+            "userName": username, "email": email,
+            "password": password,
+
         }
-        axios.post(`${baseUrl}api/user/create`, payload)
+        axios.post(`${baseUrl}api/create`, payload)
             .then((res) => {
                 console.log('the resss', res)
                 if (res.status === 200) {
-                    navigate(`${baseUrl}login`)
+                    navigate('/login');
                 }
             }).catch((err) => {
-                const theError = err['response']['data']['Error']
+                const theError = err.response?.data?.Error;
                 setRegisterError(theError);
             })
     }
@@ -47,16 +46,16 @@ function Register() {
                 <div className="form">
                     <form onSubmit={handleSubmit}>
                         <label>
-                            Fullname
+                            username
                             <input
                                 type="text"
-                                name="fullname"
-                                value={inputs.fullname || ""}
+                                name="username"
+                                value={inputs.username || ""}
                                 onChange={handleChange}
                             />
                         </label><br /><br />
                         <label>
-                            Email
+                            email
                             <input
                                 type="email"
                                 name="email"
@@ -65,47 +64,11 @@ function Register() {
                             />
                         </label><br /><br />
                         <label>
-                            Gender
-                            <input
-                                type="text"
-                                name="gender"
-                                value={inputs.gender || ""}
-                                onChange={handleChange}
-                            />
-                        </label><br /><br />
-                        <label>
-                            Address
-                            <input
-                                type="text"
-                                name="address"
-                                value={inputs.address || ""}
-                                onChange={handleChange}
-                            />
-                        </label><br /><br />
-                        <label>
-                            Phone
-                            <input
-                                type="text"
-                                name="phone"
-                                value={inputs.phone || ""}
-                                onChange={handleChange}
-                            />
-                        </label><br /><br />
-                        <label>
-                            Password
+                            password
                             <input
                                 type="password"
                                 name="password"
                                 value={inputs.password || ""}
-                                onChange={handleChange}
-                            />
-                        </label><br /><br />
-                        <label>
-                            Confirm password
-                            <input
-                                type="password"
-                                name="confirm_password"
-                                value={inputs.confirm_password || ""}
                                 onChange={handleChange}
                             />
                         </label><br /><br />

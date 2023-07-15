@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Navbar from "../components/reusables/Navbar";
 import DashboardBtn from "../components/reusables/DashboardBtn";
 import LogoArea from "../components/reusables/LogoArea";
@@ -7,34 +7,79 @@ import { baseUrl } from "../utils/baseUrl";
 import { addLikes } from "../utils/likes";
 import "../styles/Home.css"
 import { getTime } from "../utils/getTime";
+import { getToken } from "../utils/getToken";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
     const [stations, setStations] = useState([]);
     const [activeId, setActiveID] = useState("");
+    const [showNav, setShowNav] = useState(true);
+    const [showSuccesss, setShowSucess] = useState(false);
+    const [userPrice, setUserPrice] = useState(0)
+    const [isLoggedin, setIsLoggedin] = useState(false)
     const [likes, setLikes] = useState(0);
+
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         console.log('effect ran')
+        if (getToken()) {
+            setShowNav(false)
+            setIsLoggedin(true);
+        }
         axios.get(`${baseUrl}api`)
             .then((result) => {
                 const stations = result.data?.stations
-                setStations(result.data?.stations);
+                setStations(stations);
             })
     }, [])
 
     const activateSation = (ID: string) => {
         setActiveID(ID)
+        setShowSucess(false);
+    }
+
+    const letKnow = () => {
+        if (!isLoggedin) {
+            navigate('/login')
+        }
+    }
+
+    const config = {
+        headers: {
+            "Authorization": `Bearer ${getToken()}`
+        }
+    }
+    const handleSubmit = (e: any, cId: string) => {
+        e.preventDefault();
+        axios.post(`${baseUrl}api/observation/create`, {
+            "price": userPrice, "commodityId": cId
+        }, config)
+            .then((res) => {
+                if (res.status === 201) {
+                    console.log("User price created sucessfully");
+                    setUserPrice(0);
+                    setShowSucess(true);
+                }
+            }).catch((err) => {
+                if (err) {
+                    console.log('the err', err['response'])
+                    const theError = err.response?.data?.message;
+                }
+
+            })
     }
 
     return (
         <div>
             <LogoArea />
-            <Navbar /><br />
+            {showNav && <Navbar />}<br />
             {/* <DashboardBtn /> */}
 
             <main style={{ "marginTop": "50px", "paddingLeft": "3%" }}>
                 <p>Welcome, select a station and view the details.<br />
-                    Let us know the different price you bought at or like the "latest buy" if thesame.<br />
+                    Let us know the price you bought at or "like" the "latest buy" if the same.<br />
                     NB: Five "likes" automatically updates the pump price.
                 </p>
                 {
@@ -51,7 +96,7 @@ function Home() {
                                             const cId = "commodityId";
                                             return (
                                                 <>
-                                                    {comResult.commodity}: ₦{comResult.price}/Litre<br></br><br></br>
+                                                    {comResult.commodity}: ₦<span style={{ "color": 'green' }}>{comResult.price}</span>/Litre<br></br><br></br>
                                                     {comResult.observations.map((obsvnResult: any) => {
                                                         const dateString = obsvnResult.createdAt;
                                                         const observationId = obsvnResult.id, price = obsvnResult.price
@@ -59,7 +104,7 @@ function Home() {
                                                         return (
                                                             <>
                                                                 <h4>Latest buys</h4>
-                                                                <p><span style={{ "fontStyle": 'italic' }}>{obsvnResult.user?.userName}</span> bought at: ₦{price}/Litre ......... {getTime(dateString)}</p>
+                                                                <p><span style={{ "fontStyle": 'italic', "color": 'green' }}>{obsvnResult.user?.userName}</span> bought at: ₦<span style={{ "color": 'green' }}>{price}</span>/Litre, {getTime(dateString)}</p>
                                                                 <input
                                                                     type="button"
                                                                     value='like'
@@ -72,10 +117,24 @@ function Home() {
                                                                         })
 
                                                                     }}
-                                                                />: {obsvnResult.likes}
+                                                                />: {obsvnResult.likes}<br /><br />
                                                             </>
                                                         )
                                                     })}
+                                                    <h4>Bought at a different price?</h4>
+                                                    {!isLoggedin && <button onClick={letKnow}>LET US KNOW</button>}
+                                                    {isLoggedin && <form onSubmit={(e: any) => handleSubmit(e, commId)}>
+                                                        <input
+                                                            type="number"
+                                                            name="price"
+                                                            value={userPrice}
+                                                            onChange={(e: any) => setUserPrice(e.target.value)}
+                                                        />
+                                                        <input
+                                                            type="submit"
+                                                        />
+                                                    </form>}<br />
+                                                    {showSuccesss && <p style={{ "fontStyle": 'italic', "color": 'green' }}>Price successfully recorded!</p>}
                                                 </>
                                             )
                                         })}
@@ -89,8 +148,6 @@ function Home() {
                     })
                 }
             </main>
-
-
         </div>
     );
 

@@ -9,32 +9,31 @@ import LogoArea from "../components/reusables/LogoArea";
 
 function Login() {
     const navigate = useNavigate();
-    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loginError, setLoginError] = useState("");
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
         const payload = {
-            "email": email,
+            "userName": username,
             "password": password
         }
 
-        axios.post(`${baseUrl}api/user/login`, payload)
+        axios.post(`${baseUrl}api/login`, payload)
             .then((res) => {
                 // console.log('the response:', res)
                 if (res.status === 200) {
-                    const userId = res['data']['User']['id'];
-                    const token = res['data']['token'];
+                    const token = res.data?.token;;
 
-                    localStorage.setItem('userId', userId)
+                    // localStorage.setItem('userId', userId)
                     localStorage.setItem('token', token)
-                    navigate('/dashboard')
+                    navigate('/')
                 }
             }).catch((err) => {
                 if (err) {
                     console.log('the err', err['response'])
-                    const theError = err['response']['data']['message']
+                    const theError = err.response?.data?.message
                     setLoginError(theError);
                 }
 
@@ -50,16 +49,16 @@ function Login() {
                 <div className="form">
                     <form className="login-form" onSubmit={handleSubmit}>
                         <label>
-                            Email
+                            username
                             <input
-                                type="email"
-                                name="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                type="text"
+                                name="username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
                             />
                         </label><br /><br />
                         <label>
-                            Password
+                            password
                             <input
                                 type="password"
                                 name="password"

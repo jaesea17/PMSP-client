@@ -1,6 +1,7 @@
 import axios from "axios";
 
 export function addLikes(obj: Record<string, any>, data: Record<string, any>) {
+    if (obj.likes >= 5) return;
     let price = data.price, observationId = data.observationId;
     const storedID = localStorage.getItem(`obvID_${observationId}`);
     if (storedID === observationId) return;
