@@ -1,20 +1,19 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import '../styles/forms.css';
-import { baseUrl } from "../utils/baseUrl";
-import LogoArea from "../components/reusables/LogoArea";
+import '../../styles/forms.css'
+import { baseUrl } from "../../utils/baseUrl";
+import LogoArea from "../../components/reusables/LogoArea";
 
 
-function CreateProduct() {
+function UpdateProduct() {
+    const [productId, setProductId] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
-    const token = localStorage.getItem('token')
-    const [registerError, setRegisterError] = useState("");
+    const token = localStorage.getItem('token');
 
     const [inputs, setInputs] = useState({
         name: "",
         image: "",
-        brand: "",
-        category: "",
+        brand: "", category: "",
         description: "",
         price: "",
         countInStock: "",
@@ -22,6 +21,15 @@ function CreateProduct() {
         numReviews: ""
     });
 
+    const getProductId = async () => {
+        const productId = localStorage.getItem('productId') as string;
+        setProductId(productId);
+    }
+
+
+    useEffect(() => {
+        getProductId();
+    }, [])
 
     const handleChange = (e: any) => {
         const name = e.target.name;
@@ -42,44 +50,47 @@ function CreateProduct() {
             rating,
             numReviews
         } = inputs;
-        const payload = {
-            "name": name,
-            "image": image,
-            "brand": brand,
-            "category": category,
-            "description": description,
-            "price": price,
-            "countInStock": countInStock,
-            "rating": rating,
-            "numReviews": numReviews
-        }
+
+
+        //putting only input fields that where created into the payload
+        const payload: Record<string, unknown> = {}
+        if (name) payload['name'] = name
+        if (image) payload['image'] = image
+        if (brand) payload['brand'] = brand
+        if (category) payload['category'] = category
+        if (description) payload['description'] = description
+        if (price) payload['price'] = price
+        if (countInStock) payload['countInStock'] = countInStock
+        if (rating) payload['rating'] = rating
+        if (numReviews) payload['numReviews'] = numReviews
+
+
         const config = {
             headers: {
                 "Authorization": `Bearer ${token}`
             }
         }
 
-        axios.post(`${baseUrl}api/product/create`, payload, config)
+        const payloadLength = Object.keys(payload).length;
+
+        axios.patch(`${baseUrl}api/product/update/${productId}`, payload, config)
             .then((res) => {
-                console.log('the resss', res)
-                if (res.status === 200) {
-                    //navigate(`${baseUrl}login`)
+                if (res.status === 200 && payloadLength > 0) {
+                    setSuccessMsg(res['data']['message'])
                 }
-            }).catch((err) => {
-                const theError = err['response']['data']['Error']
-                setRegisterError(theError);
             })
     }
+
 
     return (
         <>
             <LogoArea />
             <div className="form-style">
-                <h3> ENTER PRODUCT DETAILS</h3>
+                <h3> UPDATE REQUIRED FIELD</h3>
                 <div className="form">
                     <form className="login-form" onSubmit={handleSubmit}>
                         <label>
-                            Name:
+                            Name
                             <input
                                 type="text"
                                 name="name"
@@ -88,7 +99,7 @@ function CreateProduct() {
                             />
                         </label><br /><br />
                         <label>
-                            Image:
+                            Image url
                             <input
                                 type="text"
                                 name="image"
@@ -97,7 +108,7 @@ function CreateProduct() {
                             />
                         </label><br /><br />
                         <label>
-                            Brand:
+                            Brand
                             <input
                                 type="text"
                                 name="brand"
@@ -106,7 +117,7 @@ function CreateProduct() {
                             />
                         </label><br /><br />
                         <label>
-                            Category:
+                            Category
                             <input
                                 type="text"
                                 name="category"
@@ -115,7 +126,7 @@ function CreateProduct() {
                             />
                         </label><br /><br />
                         <label>
-                            Description:
+                            Description
                             <input
                                 type="text"
                                 name="description"
@@ -125,16 +136,16 @@ function CreateProduct() {
 
                         </label><br /><br />
                         <label>
-                            Price:
+                            Price
                             <input
-                                type="number"
+                                type="text"
                                 name="price"
                                 value={inputs.price || ""}
                                 onChange={handleChange}
                             />
                         </label><br /><br />
                         <label>
-                            Count In Stock:
+                            Count In Stock
                             <input
                                 type="number"
                                 name="countInStock"
@@ -143,7 +154,7 @@ function CreateProduct() {
                             />
                         </label><br /><br />
                         <label>
-                            Rating:
+                            Rating
                             <input
                                 type="number"
                                 name="rating"
@@ -152,7 +163,7 @@ function CreateProduct() {
                             />
                         </label><br /><br />
                         <label>
-                            No of review:
+                            No of review
                             <input
                                 type="number"
                                 name="numReviews"
@@ -160,18 +171,15 @@ function CreateProduct() {
                                 onChange={handleChange}
                             />
                         </label><br /><br />
-                        <input className="submt-btn" type="submit" value="Add" />
+                        <input className="submt-btn" type="submit" value="Update" />
                     </form>
                     <p style={{
                         "color": "green"
                     }}>{successMsg}</p>
-                    <p style={{
-                        "color": "red"
-                    }}>{registerError}</p>
                 </div>
             </div>
         </>
     )
 
 }
-export default CreateProduct
+export default UpdateProduct

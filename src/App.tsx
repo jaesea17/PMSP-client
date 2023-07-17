@@ -6,8 +6,10 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
-import CreateProduct from './pages/CreateProduct';
-import UpdateProduct from './pages/UpdateProduct';
+import CreateStation from './pages/admin/CreateStation';
+import UpdateProduct from './pages/admin/UpdateProduct';
+import AdminLogin from './pages/admin/adminLogin';
+import AdminHome from './pages/admin/AdminHome';
 
 
 function App() {
@@ -16,9 +18,11 @@ function App() {
       <Route path="*" element={<Home />} />
       <Route path="register" element={<Register />} />
       <Route path="login" element={<Login />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/admin/" element={<AdminHome />} />
       <Route element={<PrivateRoutes />}>
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="create-product" element={<CreateProduct />} />
+        {/* <Route path="dashboard" element={<Dashboard />} /> */}
+        <Route path="/admin/create-station" element={<CreateStation />} />
         <Route path="update-product" element={<UpdateProduct />} />
       </Route>
     </Routes>

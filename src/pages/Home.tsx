@@ -18,6 +18,7 @@ function Home() {
     const [userPrice, setUserPrice] = useState(0)
     const [isLoggedin, setIsLoggedin] = useState(false)
     const [likes, setLikes] = useState(0);
+    const [search, setSearch] = useState('');
 
     const navigate = useNavigate();
 
@@ -82,69 +83,80 @@ function Home() {
                     Let us know the price you bought at or "like" the "latest buy" if the same.<br />
                     NB: Five "likes" automatically updates the pump price.
                 </p>
+                <form >
+                    <input
+                        type="search"
+                        name="search"
+                        value={search}
+                        placeholder="search"
+                        onChange={(e: any) => setSearch(e.target.value)}
+                    />
+                </form>
                 {
                     stations.map((result: any) => {
-                        return (
-                            <div style={{
-                                "marginLeft": "2rem"
-                            }}>
-                                <div onClick={() => activateSation(result.id)} className="station-name"><h3>{result.name}</h3></div>
-                                <div className={`${activeId === result.id ? 'show-div' : 'hide-div'}`} key={result.id} >
-                                    <>
-                                        {result.commodities.map((comResult: any) => {
-                                            const commId = comResult.id;
-                                            const cId = "commodityId";
-                                            return (
-                                                <>
-                                                    {comResult.commodity}: ₦<span style={{ "color": 'green' }}>{comResult.price}</span>/Litre<br></br><br></br>
-                                                    {comResult.observations.map((obsvnResult: any) => {
-                                                        const dateString = obsvnResult.createdAt;
-                                                        const observationId = obsvnResult.id, price = obsvnResult.price
-                                                        const obvId = "observationId";
-                                                        return (
-                                                            <>
-                                                                <h4>Latest buys</h4>
-                                                                <p><span style={{ "fontStyle": 'italic', "color": 'green' }}>{obsvnResult.user?.userName}</span> bought at: ₦<span style={{ "color": 'green' }}>{price}</span>/Litre, {getTime(dateString)}</p>
-                                                                <input
-                                                                    type="button"
-                                                                    value='like'
-                                                                    onClick={() => {
-                                                                        addLikes(obsvnResult, {
-                                                                            "url": `${baseUrl}api/observation/update/${obvId}:${observationId},${cId}:${commId}`,
-                                                                            price,
-                                                                            setLikes,
-                                                                            observationId
-                                                                        })
+                        if (result.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) {
+                            return (
+                                <div style={{
+                                    "marginLeft": "2rem"
+                                }}>
+                                    <div onClick={() => activateSation(result.id)} className="station-name"><h3>{result.name}</h3></div>
+                                    <div className={`${activeId === result.id ? 'show-div' : 'hide-div'}`} key={result.id} >
+                                        <>
+                                            {result.commodities.map((comResult: any) => {
+                                                const commId = comResult.id;
+                                                const cId = "commodityId";
+                                                return (
+                                                    <>
+                                                        {comResult.commodity}: ₦<span style={{ "color": 'green' }}>{comResult.price}</span>/Litre<br></br><br></br>
+                                                        {comResult.observations.map((obsvnResult: any) => {
+                                                            const dateString = obsvnResult.createdAt;
+                                                            const observationId = obsvnResult.id, price = obsvnResult.price
+                                                            const obvId = "observationId";
+                                                            return (
+                                                                <>
+                                                                    <h4>Latest buys</h4>
+                                                                    <p><span style={{ "fontStyle": 'italic', "color": 'green' }}>{obsvnResult.user?.userName}</span> bought at: ₦<span style={{ "color": 'green' }}>{price}</span>/Litre, {getTime(dateString)}</p>
+                                                                    <input
+                                                                        type="button"
+                                                                        value='like'
+                                                                        onClick={() => {
+                                                                            addLikes(obsvnResult, {
+                                                                                "url": `${baseUrl}api/observation/update/${obvId}:${observationId},${cId}:${commId}`,
+                                                                                price,
+                                                                                setLikes,
+                                                                                observationId
+                                                                            })
 
-                                                                    }}
-                                                                />: {obsvnResult.likes}<br /><br />
-                                                            </>
-                                                        )
-                                                    })}
-                                                    <h4>Bought at a different price?</h4>
-                                                    {!isLoggedin && <button onClick={letKnow}>LET US KNOW</button>}
-                                                    {isLoggedin && <form onSubmit={(e: any) => handleSubmit(e, commId)}>
-                                                        <input
-                                                            type="number"
-                                                            name="price"
-                                                            value={userPrice}
-                                                            onChange={(e: any) => setUserPrice(e.target.value)}
-                                                        />
-                                                        <input
-                                                            type="submit"
-                                                        />
-                                                    </form>}<br />
-                                                    {showSuccesss && <p style={{ "fontStyle": 'italic', "color": 'green' }}>Price successfully recorded!</p>}
-                                                </>
-                                            )
-                                        })}
-                                    </>
-                                    {/* <div><img src={result['image']} alt="A shoe image" width="400" height="400" /></div>
+                                                                        }}
+                                                                    />: {obsvnResult.likes}<br /><br />
+                                                                </>
+                                                            )
+                                                        })}
+                                                        <h4>Bought at a different price?</h4>
+                                                        {!isLoggedin && <button onClick={letKnow}>LET US KNOW</button>}
+                                                        {isLoggedin && <form onSubmit={(e: any) => handleSubmit(e, commId)}>
+                                                            <input
+                                                                type="number"
+                                                                name="price"
+                                                                value={userPrice}
+                                                                onChange={(e: any) => setUserPrice(e.target.value)}
+                                                            />
+                                                            <input
+                                                                type="submit"
+                                                            />
+                                                        </form>}<br />
+                                                        {showSuccesss && <p style={{ "fontStyle": 'italic', "color": 'green' }}>Price successfully recorded!</p>}
+                                                    </>
+                                                )
+                                            })}
+                                        </>
+                                        {/* <div><img src={result['image']} alt="A shoe image" width="400" height="400" /></div>
                                 <div>{result['brand']}</div>
                                 <div>₦ {result['price']}</div> */}
+                                    </div>
                                 </div>
-                            </div>
-                        )
+                            )
+                        }
                     })
                 }
             </main>
